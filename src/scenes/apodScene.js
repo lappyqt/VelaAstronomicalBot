@@ -2,24 +2,25 @@ import { BaseScene } from "telegraf/scenes";
 import { nasaApiService } from "../services/nasaApiService.js"; 
 import translate from "translate";
 
-const nasaService = new nasaApiService(); 
+import replicas from "../json/replicas_text.json" assert { type: "json" };
+
 const targetLang = "ru";
 
 export const apodScene = new BaseScene("APOD_SCENE");
 
 apodScene.enter((context) => 
 {
-    context.reply("Пожалуйста, укажите дату астрономической фотографии...", { reply_markup: {
+    context.reply(replicas.scenes.apod.enter, { reply_markup: {
         inline_keyboard: [
             [{ text: "Сегодня", callback_data: "today" }, { text: "Другая дата", callback_data: "another_date" }],
-            [{ text: "5 случайных", callback_data: "multiple" }]
+            [{ text: "Случайные", callback_data: "multiple" }]
         ]
     }})
 });
 
 apodScene.leave(async (context) => 
 {
-    await context.reply("Чтобы снова просматривать астрономические фотографии, введите: /apod");
+    await context.reply(replicas.scenes.apod.leave);
 });
 
 apodScene.command("leave", (context) => context.scene.leave());
@@ -27,8 +28,18 @@ apodScene.command("leave", (context) => context.scene.leave());
 apodScene.action("today", async (context) => 
 {
     /** @type { ApodResponse } */
-    const apodData = await nasaService.getAPOD(new Date().toISOString().slice(0, 10));
-    
+    const apodData = await nasaApiService.getAPOD(new Date().toISOString().slice(0, 10));
+
+    if (apodData.media_type != "image") {
+        await Promise.all([
+            context.answerCbQuery(),
+            context.reply(apodData.url),
+            context.scene.leave()
+        ]);
+
+        return;
+    }
+
     await Promise.all([
         context.answerCbQuery(),
         context.replyWithPhoto(apodData.url, { caption: await translate(apodData.title, targetLang) }),
@@ -36,10 +47,9 @@ apodScene.action("today", async (context) =>
             inline_keyboard: [
                 [{ text: "Просмотреть в высоком разрешении", url: apodData.hdurl }]
             ]
-        }})
+        }}),
+        context.scene.leave()
     ]);
-
-    context.scene.leave();
 });
 
 apodScene.action("another_date", (context) => 
@@ -54,7 +64,14 @@ apodScene.action("another_date", (context) =>
             try 
             {
                 /** @type { ApodResponse } */
-                const apodData = await nasaService.getAPOD(context.message.text);
+                const apodData = await nasaApiService.getAPOD(context.message.text);
+
+                if (apodData.media_type != "image") {
+                    await context.reply(apodData.url);
+                    await context.scene.leave();
+
+                    return;
+                }
 
                 await context.replyWithPhoto(apodData.url, { caption: await translate(apodData.title, targetLang) });
                 await context.reply(await translate(apodData.explanation, targetLang) + "\n\nМожете продолжать писать даты или выйти", { reply_markup: { 
@@ -80,13 +97,15 @@ apodScene.action("another_date", (context) =>
 apodScene.action("multiple", async (context) => 
 {
      /** @type { ApodResponse[] } */
-    const apods = await nasaService.getMultipleAPOD(5);
+    const apods = await nasaApiService.getMultipleAPOD(5);
 
     for (let apod of apods) {
         apod.title = await translate(apod.title, targetLang);
     }
 
-    const mediaGroup = apods.map(apod => new Object({ media: apod.url, type: "photo", caption: `${apod.title} (${apod.date})` }));
+    const mediaGroup = apods
+        .filter(x => x.media_type == "image")
+        .map(apod => new Object({ media: apod.url, type: "photo", caption: `${apod.title} (${apod.date})` }));
 
     await Promise.all([
         context.answerCbQuery(),

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export class nasaApiService {
+export class NasaApiService {
     /** 
      * @param { string } date 
      * @returns { ApodResponse } 
@@ -19,3 +19,5 @@ export class nasaApiService {
         return response.data;
     } 
 }
+
+export const nasaApiService = new NasaApiService();
