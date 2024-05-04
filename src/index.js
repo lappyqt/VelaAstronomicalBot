@@ -27,14 +27,18 @@ bot.use(session());
 bot.use(stage.middleware());
 
 bot.command("apod", (context) => context.scene.enter("APOD_SCENE"));
-bot.command("sdo", (context) => sdoService.handleSDOCommand(context));
+bot.command("sun", (context) => sdoService.handleSunCommand(context));
 
 bot.launch();
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
-cron.schedule("* * */12 * * *", async () => {
+await sdoService.donwloadSunPhotos(join(rootDir, "assets/SDO"));
+
+cron.schedule("* * 6 * * *", async () => {
     console.log("handled");
     await sdoService.donwloadSunPhotos(join(rootDir, "assets/SDO"));
 });
+
+console.log("https://t.me/VelaAstronomicalBot");

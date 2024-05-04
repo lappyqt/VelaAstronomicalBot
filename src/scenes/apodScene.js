@@ -54,7 +54,7 @@ apodScene.action("today", async (context) =>
 
 apodScene.action("another_date", (context) => 
 {
-    context.reply("Укажите дату в формате ГГГГ-ММ-ДД. Например: 2005-10-13.");
+    context.reply(replicas.scenes.apod.another_date.first_reply);
     context.answerCbQuery();
 
     apodScene.on("text", async (context) => {
@@ -84,12 +84,12 @@ apodScene.action("another_date", (context) =>
             catch (exception) 
             {
                 console.log(exception);
-                context.reply("На данную дату нет фотографии. В базе данных Nasa находятся фотографии с 16 января 1995 по сегодняшнее число.");
+                context.reply(replicas.scenes.apod.another_date.wrond_date);
             }
         }
         else 
         {
-            context.reply("Неверный формат даты...");
+            context.reply(replicas.scenes.apod.another_date.wrong_format);
         }
     });
 });
