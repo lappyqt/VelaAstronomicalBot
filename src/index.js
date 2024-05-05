@@ -7,8 +7,8 @@ import { join } from "path";
 import cron from "node-cron";
 import dotenvt from "dotenv";
 
-import replicas from "./json/replicas_text.json" assert { type: "json" };
-import commands from "./json/command_list.json" assert { type: "json" };
+import replicas from "./assets/json/replicas_text.json" assert { type: "json" };
+import commands from "./assets/json/command_list.json" assert { type: "json" };
 
 export const rootDir = import.meta.dirname;
 
@@ -37,7 +37,6 @@ process.once('SIGTERM', () => bot.stop('SIGTERM'));
 await sdoService.donwloadSunPhotos(join(rootDir, "assets/SDO"));
 
 cron.schedule("* * 6 * * *", async () => {
-    console.log("handled");
     await sdoService.donwloadSunPhotos(join(rootDir, "assets/SDO"));
 });
 

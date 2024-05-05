@@ -2,7 +2,7 @@ import { BaseScene } from "telegraf/scenes";
 import { nasaApiService } from "../services/nasaApiService.js"; 
 import translate from "translate";
 
-import replicas from "../json/replicas_text.json" assert { type: "json" };
+import replicas from "../assets/json/replicas_text.json" assert { type: "json" };
 
 const targetLang = "ru";
 
