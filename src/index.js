@@ -4,6 +4,8 @@ import { apodScene } from "./scenes/apodScene.js";
 import { sdoService } from "./services/sdoService.js";
 import { join } from "path";
 
+import express from "express";
+
 import cron from "node-cron";
 import dotenvt from "dotenv";
 
@@ -41,3 +43,13 @@ cron.schedule("* * 6 * * *", async () => {
 });
 
 console.log("https://t.me/VelaAstronomicalBot");
+
+// HTTP Port
+
+const app = express();
+
+app.get("/", (res, req) => {
+    req.send("VelaAstronomicalBot");
+});
+
+app.listen(80);
