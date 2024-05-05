@@ -17,7 +17,7 @@ dotenvt.config();
 const bot = new Telegraf(process.env.TELEGRAM_API_KEY);
 const stage = new Stage([apodScene]); 
 
-bot.telegram.setMyCommands(commands["command_list"]);
+bot.telegram.setMyCommands(commands.command_list);
 
 bot.start(context => {
     context.replyWithAnimation("https://i.pinimg.com/originals/fa/48/bb/fa48bb0e04197ec44a2948a4f3ae9173.gif", { caption: replicas.bot_start });

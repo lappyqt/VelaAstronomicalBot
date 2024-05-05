@@ -40,16 +40,18 @@ apodScene.action("today", async (context) =>
         return;
     }
 
+    context.answerCbQuery();
+
     await Promise.all([
-        context.answerCbQuery(),
         context.replyWithPhoto(apodData.url, { caption: await translate(apodData.title, targetLang) }),
         context.reply(await translate(apodData.explanation, targetLang), { reply_markup: {
             inline_keyboard: [
                 [{ text: "Просмотреть в высоком разрешении", url: apodData.hdurl }]
             ]
-        }}),
-        context.scene.leave()
+        }})
     ]);
+
+    context.scene.leave();
 });
 
 apodScene.action("another_date", (context) => 
