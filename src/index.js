@@ -38,7 +38,7 @@ process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
 await sdoService.donwloadSunPhotos(join(rootDir, "assets/SDO"));
 
-cron.schedule("* * 6 * * *", async () => {
+cron.schedule("* * 6,12,18 * * *", async () => {
     await sdoService.donwloadSunPhotos(join(rootDir, "assets/SDO"));
 });
 
