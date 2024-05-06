@@ -86,7 +86,7 @@ apodScene.action("another_date", (context) =>
             catch (exception) 
             {
                 console.log(exception);
-                context.reply(replicas.scenes.apod.another_date.wrond_date);
+                context.reply(replicas.scenes.apod.another_date.wrong_date);
             }
         }
         else 
